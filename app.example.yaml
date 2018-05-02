@@ -1,0 +1,12 @@
+# Configuration for deployment on Google Cloud Platform
+runtime: nodejs
+env: flex
+
+# Production database with Google Cloud SQL
+env_variables:
+  SQL_USER: <Database username>
+  SQL_PASSWORD: <Password for database user>
+  SQL_DATABASE: <Database name (e.g. `typographic`)>
+  INSTANCE_CONNECTION_NAME: <Cloud SQL instance connection name>
+beta_settings:
+    cloud_sql_instances: <Cloud SQL instance connection name>

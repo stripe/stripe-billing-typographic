@@ -1,0 +1,56 @@
+{
+  "name": "typographic",
+  "version": "1.0.0",
+  "description": "Typographic is an example business using Stripe Billing.",
+  "author": "",
+  "main": "server.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/stripe/stripe-billing-typographic.git"
+  },
+  "license": "MIT",
+  "engines": {
+    "node": ">=8.0.0"
+  },
+  "dependencies": {
+    "axios": "^0.18.0",
+    "bcryptjs": "^2.4.3",
+    "body-parser": "^1.18.2",
+    "connect-history-api-fallback": "^1.5.0",
+    "dotenv": "^5.0.1",
+    "express": "^4.16.3",
+    "jsonwebtoken": "^8.2.0",
+    "jwt-decode": "^2.2.0",
+    "knex": "^0.14.4",
+    "mysql": "^2.15.0",
+    "parse5": "^2.2.3",
+    "sqlite3": "^4.0.0",
+    "stripe": "^5.8.0",
+    "vue": "^2.5.16",
+    "vue-router": "^3.0.1",
+    "webfontloader": "^1.6.28"
+  },
+  "devDependencies": {
+    "chokidar": "^2.0.3",
+    "nodemon": "^1.17.3",
+    "rollup": "^0.57.1",
+    "rollup-plugin-commonjs": "^9.1.0",
+    "rollup-plugin-json": "^2.3.0",
+    "rollup-plugin-node-builtins": "^2.1.2",
+    "rollup-plugin-node-globals": "^1.2.0",
+    "rollup-plugin-node-resolve": "^3.3.0",
+    "rollup-plugin-replace": "^2.0.0",
+    "rollup-plugin-uglify": "^3.0.0",
+    "rollup-plugin-vue": "^3.0.0",
+    "uglify-es": "^3.3.10",
+    "vue-template-compiler": "^2.5.16"
+  },
+  "scripts": {
+    "build": "rollup -c",
+    "dev": "rollup -c -w",
+    "setup": "node setup.js",
+    "start": "node server/server.js",
+    "production": "NODE_ENV=production node server/server.js",
+    "inspect": "nodemon --inspect server/server.js"
+  }
+}

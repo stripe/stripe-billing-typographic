@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="10px" height="10px" viewBox="0 0 10 10" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 49.2 (51160) - http://www.bohemiancoding.com/sketch -->
+    <title>ActionIcon/New</title>
+    <desc>Created with Sketch.</desc>
+    <defs>
+        <path d="M5.75,5.75 L5.75,9.3282731 C5.75,9.69925762 5.41710138,10 5,10 C4.58578644,10 4.25,9.71022308 4.25,9.3282731 L4.25,5.75 L0.671726901,5.75 C0.289776924,5.75 0,5.41421356 0,5 C0,4.58289862 0.300742377,4.25 0.671726901,4.25 L4.25,4.25 L4.25,0.671726901 C4.25,0.289776924 4.58578644,7.12875206e-17 5,4.5924255e-17 C5.41710138,2.03841613e-17 5.75,0.300742377 5.75,0.671726901 L5.75,4.25 L9.3282731,4.25 C9.69925762,4.25 10,4.58289862 10,5 C10,5.41421356 9.71022308,5.75 9.3282731,5.75 L5.75,5.75 Z" id="path-1"></path>
+    </defs>
+    <g id="Flow" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="5A-Account" transform="translate(-851.000000, -1213.000000)">
+            <g id="Group-3" transform="translate(181.000000, 1196.000000)">
+                <g id="ActionIcon/New" transform="translate(670.000000, 17.000000)">
+                    <mask id="mask-2" fill="white">
+                        <use xlink:href="#path-1"></use>
+                    </mask>
+                    <use id="Mask" fill="#6772E5" xlink:href="#path-1"></use>
+                    <g id="Icon-Fill" mask="url(#mask-2)" fill="#6772E5">
+                        <g transform="translate(-3.200000, -1.200000)" id="Color">
+                            <rect x="1.82076576e-13" y="-4.52970994e-14" width="16.8" height="16.8"></rect>
+                        </g>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>
