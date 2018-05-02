@@ -37,18 +37,18 @@ This repository includes two components:
   - [Vue.js application][client] with a front-end interface for the web service.
 
 Here are a few key files where we interact with Stripe's platform:
-  - [server/models][]: Defines our database models and includes all the server-side interaction with [Billing](https://stripe.com/billing) and [Sources](https://stripe.com/docs/sources).
-  - [server/models/Plan.js][]: The [`setupPlans`][] method creates and manages the [Products and Plans](https://stripe.com/docs/billing/subscriptions/products-and-plans) for our Stripe account.
-  - [server/routes/stripeRoutes.js][]: Express API routes for all payments and billing actions for our front-end app.
-  - [client/src/components/Payment.vue][]: Vue front-end component for payment options, which includes an [Element](https://stripe.com/elements) to collect credit-card details.
+  - [`server/models`][]: Defines our database models and includes all the server-side interaction with [Billing](https://stripe.com/billing) and [Sources](https://stripe.com/docs/sources).
+  - [`server/models/Plan.js`][]: The [`setupPlans`][] method creates and manages the [Products and Plans](https://stripe.com/docs/billing/subscriptions/products-and-plans) for our Stripe account.
+  - [`server/routes/stripeRoutes.js`][]: Express API routes for all payments and billing actions for our front-end app.
+  - [`client/src/components/Payment.vue`][]: Vue front-end component for payment options, which includes an [Element](https://stripe.com/elements) to collect credit-card details.
 
 [server]: https://github.com/stripe/stripe-billing-typographic
 [client]: https://github.com/stripe/stripe-billing-typographic
-[server/models]: https://github.com/stripe/stripe-billing-typographic/tree/master/server/models
-[server/models/Plan.js]: https://github.com/stripe/stripe-billing-typographic/tree/master/server/models/Plan.js
+[`server/models`]: https://github.com/stripe/stripe-billing-typographic/tree/master/server/models
+[`server/models/Plan.js`]: https://github.com/stripe/stripe-billing-typographic/tree/master/server/models/Plan.js
 [`setupPlans`]: https://github.com/stripe/stripe-billing-typographic/tree/master/server/models/Plan.js#L64
-[server/routes/stripeRoutes.js]: https://github.com/stripe/stripe-billing-typographic/tree/master/server/routes/stripeRoutes.js
-[client/src/components/Payment.vue]: https://github.com/stripe/stripe-billing-typographic/tree/master/client/src/components/Payment.vue
+[`server/routes/stripeRoutes.js`]: https://github.com/stripe/stripe-billing-typographic/tree/master/server/routes/stripeRoutes.js
+[`client/src/components/Payment.vue`]: https://github.com/stripe/stripe-billing-typographic/tree/master/client/src/components/Payment.vue
 
 ## Requirements
 
