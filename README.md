@@ -1,8 +1,36 @@
 # Typographic: Stripe Billing Demo
 
-Typographic is a sample web application for a hosted webfont service built with [Stripe Billing](https://stripe.com/billing) and [Elements](https://stripe.com/elements). Each user account offers monthly and metered plans (based on their usage).
+Typographic is a sample web application for a hosted webfont service built with [Stripe Billing](https://stripe.com/billing) and [Elements](https://stripe.com/elements). This is a complete Stripe integration that subscribes users to [multiple plans][] (with monthly and [metered billing][]),  uses [tiered pricing][] , tracks [metered usage], and provides [invoices][].
+
+[multiple plans]: https://stripe.com/docs/billing/subscriptions/multiplan
+[metered billing]: https://stripe.com/docs/billing/subscriptions/metered-billing
+[tiered pricing]: https://stripe.com/docs/billing/subscriptions/tiers
+[metered usage]: https://stripe.com/docs/billing/subscriptions/metered-billing#reporting-usage
+[invoices]: https://stripe.com/docs/billing/invoices
 
 **You can try the app live at [typographic.io](https://typographic.io).**
+
+## Overview
+
+<img src="https://github.com/stripe/stripe-billing-typographic/blob/master/screenshots/typographic-screenshot.png?raw=true"/>
+
+Typographic is a complete, full-stack example of a Stripe Billing integration:
+<!-- prettier-ignore -->
+|     |Features
+:---: | :---
+🗂|**Multiple plans.** Each level of service (Starter, Growth, and Enterprise) include monthly and metered plans.
+💸|**Tiered pricing.** Metered plans use [tiered pricing](https://stripe.com/docs/billing/subscriptions/tiers) to build a sophisticated pay-as-you-go billing model with [graduated pricing](https://stripe.com/docs/billing/subscriptions/tiers#graduated).
+📈|**Usage records.** Metered usage is tracked with the [Usage Record](https://stripe.com/docs/api#usage_records) API.
+💌|**Hosted invoices.** Users can pay via credit card or a receive a [hosted invoice]() by email.
+📬|**Upcoming invoices.** Estimated costs for the next billing cycle are calculated using the [Invoices](https://stripe.com/docs/billing/invoices) API (based on [monthly](https://stripe.com/docs/billing/subscriptions/examples#simple-monthly-billing) and [metered usage](https://stripe.com/docs/billing/subscriptions/metered-billing)).
+⚡️|**Products and Plans.** Typographic uses the Stripe [Products and Plans](https://stripe.com/docs/billing/subscriptions/products-and-plans) APIs.
+💳|**Card payments with Elements.** This demo uses pre-built Stripe components customized to fit the app design, including the [Card Element](https://stripe.com/docs/elements) which provides real-time validation, formatting, and autofill.
+🌏|**Vue.js frontend.** Single-page [Vue](https://vuejs.org) app demonstrating how to use Elements in a component-based web framework.
+☕️|**Node.js backend.** An [Express](https://expressjs.com/) server manages billing and user data between the database and Stripe's API.
+📦|**Database support.** Uses [Knex.js](http://knexjs.org/) and [SQLite](https://www.sqlite.org/index.html) (by default) to demonstrate a data modeling pattern for the [Billing](https://stripe.com/docs/billing/quickstart) API. 
+🔑|**User authentication.** JSON web tokens ([JWT](https://jwt.io/)) and an Express authentication scheme are included for user login and registration.
+
+## Stripe Billing Integration
 
 This repository includes two components:
   - [Express server in Node.js][server] to create and manage subscriptions via an API.
@@ -21,21 +49,6 @@ Here are a few key files where we interact with Stripe's platform:
 [`setupPlans`]: https://github.com/stripe/stripe-billing-typographic/tree/master/server/models/Plan.js#L64
 [server/routes/stripeRoutes.js]: https://github.com/stripe/stripe-billing-typographic/tree/master/server/routes/stripeRoutes.js
 [client/src/components/Payment.vue]: https://github.com/stripe/stripe-billing-typographic/tree/master/client/src/components/Payment.vue
-## Features
-<!-- prettier-ignore -->
-|     |Feature
-:---: | :---
-🗂|**Multiple plans.** Each level of service (Starter, Growth, and Enterprise) include monthly and metered plans.
-💸|**Tiered pricing.** Metered plans use [tiered pricing](https://stripe.com/docs/billing/subscriptions/tiers) to build a sophisticated pay-as-you-go billing model with [graduated pricing](https://stripe.com/docs/billing/subscriptions/tiers#graduated).
-📈|**Usage records.** Metered usage is tracked with the [Usage Record](https://stripe.com/docs/api#usage_records) API.
-💌|**Hosted invoices.** Users can pay via credit card or a receive a [hosted invoice]() by email.
-📬|**Upcoming invoices.** Estimated costs for the next billing cycle are calculated using the [Invoices](https://stripe.com/docs/billing/invoices) API (based on [monthly](https://stripe.com/docs/billing/subscriptions/examples#simple-monthly-billing) and [metered usage](https://stripe.com/docs/billing/subscriptions/metered-billing)).
-⚡️|**Products and Plans.** Typographic uses the Stripe [Products and Plans](https://stripe.com/docs/billing/subscriptions/products-and-plans) APIs.
-💳|**Card payments with Elements.** This demo uses pre-built Stripe components customized to fit the app design, including the [Card Element](https://stripe.com/docs/elements) which provides real-time validation, formatting, and autofill.
-🌏|**Vue.js frontend.** Single-page [Vue](https://vuejs.org) app demonstrating how to use Elements in a component-based web framework.
-☕️|**Node.js backend.** An [Express](https://expressjs.com/) server manages billing and user data between the database and Stripe's API.
-📦|**Database support.** Uses [Knex.js](http://knexjs.org/) and [SQLite](https://www.sqlite.org/index.html) (by default) to demonstrate a data modeling pattern for the [Billing](https://stripe.com/docs/billing/quickstart) API. 
-🔑|**User authentication.** JSON web tokens ([JWT](https://jwt.io/)) and an Express authentication scheme are included for user login and registration.
 
 ## Requirements
 
@@ -44,10 +57,6 @@ You'll need a Stripe account to manage customer subscriptions and payments. [Sig
 Typographic also requires Node.js >=8.x to run this app.
 
 [sign-up]: https://dashboard.stripe.com/register
-
-## Screenshots
-
-<img src="https://github.com/stripe/stripe-billing-typographic/blob/master/screenshots/typographic-screenshot.png?raw=true" />
 
 ## Getting Started
 
@@ -75,7 +84,7 @@ npm start
 
 Go to [https://localhost:3000]() in your browser to start using Typographic.
 
-## Resetting data
+## Resetting Data
 If you'd like to wipe the slate clean and start with a fresh environment, you can [wipe all test data](https://dashboard.stripe.com/account/data) from your Stripe account, then rebuild your local database:
 
 ```
