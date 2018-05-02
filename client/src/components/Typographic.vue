@@ -122,13 +122,17 @@ button.loading:before, button.loading:after {
 }
 
 button.loading:after {
-  -webkit-animation-delay: -1.0s;
-  animation-delay: -1.0s;
+  -webkit-animation-delay: -1.1s;
+  animation-delay: -1.1s;
 }
 
 @-webkit-keyframes bounce {
-  0%, 100% { -webkit-transform: scale(0.0) }
-  50% { -webkit-transform: scale(1.0) }
+  0%, 100% {
+    -webkit-transform: scale(0.0) 
+  }
+  50% {
+    -webkit-transform: scale(1.0)
+  }
 }
 
 @keyframes bounce {

@@ -70,7 +70,7 @@ header {
   margin-right: 5px;
 }
 
-h1 {
+h1, h1 a {
   font-size: 20px;
   font-weight: 600;
 }

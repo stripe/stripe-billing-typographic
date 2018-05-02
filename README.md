@@ -21,7 +21,7 @@ Typographic is a complete, full-stack example of a Stripe Billing integration:
 🗂|**Multiple plans.** Each level of service (Starter, Growth, and Enterprise) include monthly and metered plans.
 💸|**Tiered pricing.** Metered plans use [tiered pricing](https://stripe.com/docs/billing/subscriptions/tiers) to build a sophisticated pay-as-you-go billing model with [graduated pricing](https://stripe.com/docs/billing/subscriptions/tiers#graduated).
 📈|**Usage records.** Metered usage is tracked with the [Usage Record](https://stripe.com/docs/api#usage_records) API.
-💌|**Hosted invoices.** Users can pay via credit card or a receive a [hosted invoice]() by email.
+💌|**Hosted invoices.** Users can pay via credit card or receive a [hosted invoice]() by email.
 📬|**Upcoming invoices.** Estimated costs for the next billing cycle are calculated using the [Invoices](https://stripe.com/docs/billing/invoices) API (based on [monthly](https://stripe.com/docs/billing/subscriptions/examples#simple-monthly-billing) and [metered usage](https://stripe.com/docs/billing/subscriptions/metered-billing)).
 ⚡️|**Products and Plans.** Typographic uses the Stripe [Products and Plans](https://stripe.com/docs/billing/subscriptions/products-and-plans) APIs.
 💳|**Card payments with Elements.** This demo uses pre-built Stripe components customized to fit the app design, including the [Card Element](https://stripe.com/docs/elements) which provides real-time validation, formatting, and autofill.
@@ -66,7 +66,9 @@ Install dependinces using npm (or yarn):
 npm install
 ```
 
-Copy the example .env file and add your own [Stripe API keys](https://dashboard.stripe.com/account/apikeys):
+Copy the example .env file. You'll need to fill out two details:
+- A random 20-character string that will be used to keep user authentication secure (with [JSON Web Tokens](https://jwt.io))
+- Your own [Stripe API keys](https://dashboard.stripe.com/account/apikeys):
 
 ```
 cp .env.example .env
