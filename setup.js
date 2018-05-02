@@ -83,7 +83,7 @@ async function rollup() {
   await exec('./node_modules/rollup/bin/rollup -c');
 }
 
-// Drop all Typograhic tables from the database
+// Drop all Typographic tables from the database
 async function dropTables() {
   console.log('🔻  Dropping existing database tables');
   await Promise.all([
@@ -96,7 +96,7 @@ async function dropTables() {
 
 // Create tables on our database
 async function createTables() {
-  console.log('✨  Creating database tables for Typograpic');
+  console.log('✨  Creating database tables for Typographic');
   await Promise.all([
     knex.schema.createTable('accounts', t => {
       t.increments();

@@ -3,7 +3,7 @@
  * Stripe Billing demo. Created by Michael Glukhovsky (@mglukhovsky).
  *
  * This set of Express routes handle all Stripe Billing actions.
- * 
+ *
  * A Stripe Billing integration typically includes the follow:
  *   - Local user accounts for each Customer
  *   - Routes for managing a user's Subscription, using a Plan
@@ -122,7 +122,7 @@ router.delete('/subscription', verifyToken, async (req, res, next) => {
 router.post('/invoices/subscribe', verifyToken, async (req, res, next) => {
   const {customerId} = res.locals;
   try {
-    // Get the customer's susbcription
+    // Get the customer's subscription
     const customer = await Customer.getById(customerId);
     customer.subscribeInvoices();
     return res.sendStatus(200);
@@ -135,7 +135,7 @@ router.post('/invoices/subscribe', verifyToken, async (req, res, next) => {
 router.get('/invoices/upcoming', verifyToken, async (req, res, next) => {
   const {customerId} = res.locals;
   try {
-    // Get the customer's susbcription
+    // Get the customer's subscription
     const customer = await Customer.getById(customerId);
     const subscription = await customer.getSubscription();
     // If we don't have a subscription, the estimate will be zero
@@ -177,7 +177,7 @@ router.post('/usage', verifyToken, async (req, res, next) => {
   const {numRequests} = req.body;
 
   if (!numRequests) {
-    return next(new Error('Missing required paramter: `numRequests`.'));
+    return next(new Error('Missing required parameter: `numRequests`.'));
   }
 
   try {
