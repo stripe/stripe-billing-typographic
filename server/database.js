@@ -8,7 +8,7 @@
 
 const config = require('../config');
 
-// Default knex parameters for a local development databse defined in our config
+// Default knex parameters for a local development database defined in our config
 let db = config.database;
 // If we have a Google Cloud SQL instance defined, set up a database connection to it
 if (process.env.INSTANCE_CONNECTION_NAME) {

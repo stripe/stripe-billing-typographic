@@ -92,7 +92,7 @@ export default {
         // Server: create a new account / log in with the provided credentials
         //   - returns a JWT token for the user.
         const authResponse = await axios.post(apiRoute, {email, password});
-        // Authentication succcess
+        // Authentication success
         store.authenticated = true;
         // Store the JWT from the server
         auth.setToken(authResponse.data.token);

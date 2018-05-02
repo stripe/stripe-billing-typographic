@@ -27,7 +27,7 @@ Typographic is a complete, full-stack example of a Stripe Billing integration:
 💳|**Card payments with Elements.** This demo uses pre-built Stripe components customized to fit the app design, including the [Card Element](https://stripe.com/docs/elements) which provides real-time validation, formatting, and autofill.
 🌏|**Vue.js frontend.** Single-page [Vue](https://vuejs.org) app demonstrating how to use Elements in a component-based web framework.
 ☕️|**Node.js backend.** An [Express](https://expressjs.com/) server manages billing and user data between the database and Stripe's API.
-📦|**Database support.** Uses [Knex.js](http://knexjs.org/) and [SQLite](https://www.sqlite.org/index.html) (by default) to demonstrate a data modeling pattern for the [Billing](https://stripe.com/docs/billing/quickstart) API. 
+📦|**Database support.** Uses [Knex.js](http://knexjs.org/) and [SQLite](https://www.sqlite.org/index.html) (by default) to demonstrate a data modeling pattern for the [Billing](https://stripe.com/docs/billing/quickstart) API.
 🔑|**User authentication.** JSON web tokens ([JWT](https://jwt.io/)) and an Express authentication scheme are included for user login and registration.
 
 ## Stripe Billing Integration
@@ -60,7 +60,7 @@ Typographic also requires Node.js >=8.x to run this app.
 
 ## Getting Started
 
-Install dependinces using npm (or yarn):
+Install dependencies using npm (or yarn):
 
 ```
 npm install
