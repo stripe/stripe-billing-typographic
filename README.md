@@ -67,8 +67,9 @@ npm install
 ```
 
 Copy the example .env file. You'll need to fill out two details:
-- A random 20-character string that will be used to keep user authentication secure (with [JSON Web Tokens](https://jwt.io))
-- Your own [Stripe API keys](https://dashboard.stripe.com/account/apikeys):
+
+- Your [Stripe API keys](https://dashboard.stripe.com/account/apikeys)
+- A random 20-character string to keep user authentication secure (using [JSON Web Tokens](https://jwt.io))
 
 ```
 cp .env.example .env
@@ -84,7 +85,7 @@ Run the app:
 npm start
 ```
 
-Go to [https://localhost:3000]() in your browser to start using Typographic.
+Go to [http://localhost:3000]() in your browser to start using Typographic.
 
 ## Resetting Data
 If you'd like to wipe the slate clean and start with a fresh environment, you can [wipe all test data](https://dashboard.stripe.com/account/data) from your Stripe account, then rebuild your local database:
