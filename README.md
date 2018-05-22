@@ -85,7 +85,7 @@ Run the app:
 npm start
 ```
 
-Go to [http://localhost:3000]() in your browser to start using Typographic.
+Go to [http://localhost:3000](http://localhost:3000) in your browser to start using Typographic.
 
 ## Resetting Data
 If you'd like to wipe the slate clean and start with a fresh environment, you can [wipe all test data](https://dashboard.stripe.com/account/data) from your Stripe account, then rebuild your local database:
