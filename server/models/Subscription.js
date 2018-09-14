@@ -176,7 +176,7 @@ class Subscription extends Model {
         // Define a relation to Customer who owns this Subscription
         customerId: customer.id,
       };
-      const [subscriptionId] = await db(this.table).insert(subscription);
+      const [subscriptionId] = await this.insert(subscription);
       subscription.id = subscriptionId;
 
       return new Subscription(subscription);

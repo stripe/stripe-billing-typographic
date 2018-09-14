@@ -7,10 +7,21 @@
  */
 'use strict';
 
+const dbType = require('../../config').database.client
+const db = require('../database')
+
 class Model {
   constructor(opts) {
     if (!opts) {
       throw new Error('The model requires an options object.')
+    }
+  }
+
+  static async insert(object) {
+    if (dbType == 'sqlite3') {
+      return db(this.table).insert(object);
+    } else {
+      return db(this.table).returning('id').insert(object);
     }
   }
 
