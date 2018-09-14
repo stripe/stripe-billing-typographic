@@ -125,7 +125,6 @@ class Account extends Model {
       // Return a new Account instance
       return new Account(account);
     } catch (e) {
-      console.log(e)
       throw new Error(e);
     }
   }

@@ -18,6 +18,9 @@ class Model {
   }
 
   static async insert(object) {
+    // Knex with sqlite returns an array of inserted ids and prints warnings if
+    // returning() is used.  With Postgres, returning() is necessary to get the
+    // inserted ids instead of a Result object.
     if (dbType == 'sqlite3') {
       return db(this.table).insert(object);
     } else {
