@@ -222,7 +222,7 @@ class Plan extends Model {
       let deleted = await db(this.table).del();
       // Insert references to the table
       for (let plan of plans) {
-        let inserted = await db(this.table).insert(plan);
+        let inserted = await this.insert(plan);
       }
       console.log('🔄  Synced to local database.');
     } catch (e) {

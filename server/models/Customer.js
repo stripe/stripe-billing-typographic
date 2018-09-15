@@ -144,7 +144,7 @@ class Customer extends Model {
         accountId,
         email,
       };
-      const [customerId] = await db(this.table).insert(customer);
+      const [customerId] = await this.insert(customer);
       customer.id = customerId;
 
       return new Customer(customer);

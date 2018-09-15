@@ -115,7 +115,7 @@ class Account extends Model {
         email,
         password: hashed,
       };
-      const [accountId] = await db(this.table).insert(account);
+      const [accountId] = await this.insert(account);
       account.id = accountId;
 
       // Create a Customer that belongs to this Account

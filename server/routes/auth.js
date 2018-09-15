@@ -35,6 +35,7 @@ router.post('/signup', async (req, res, next) => {
     // Success: generate a JSON web token and respond with the JWT
     return res.json({token: generateToken(account.id, account.customer.id)});
   } catch (e) {
+    console.log(e)
     return next(new Error(e));
   }
 });
