@@ -8,10 +8,11 @@
 
 const config = require('../../config');
 const router = require('express').Router();
-const jwt = require('jsonwebtoken');
 const Account = require('../models/Account');
 const Customer = require('../models/Customer');
 const db = require('../database');
+const crypto = require('crypto');
+const getRequestToken = require('../middleware/session').getRequestToken;
 
 // Sign up a new user
 router.post('/signup', async (req, res, next) => {
@@ -32,10 +33,9 @@ router.post('/signup', async (req, res, next) => {
     }
     const account = await Account.create(email, password);
 
-    // Success: generate a JSON web token and respond with the JWT
-    return res.json({token: generateToken(account.id, account.customer.id)});
+    // Success: generate a session record with a random token and respond with the token
+    return res.json({token: await createSession(account.id, account.customer.id) })
   } catch (e) {
-    console.log(e)
     return next(new Error(e));
   }
 });
@@ -56,11 +56,12 @@ router.post('/login', async (req, res, next) => {
 
       const verifiedPassword = await account.comparePassword(password);
       if (verifiedPassword) {
-        // Success: generate and respond with the JWT
-        return res.json({token: generateToken(account.id, customer.id)});
+        // Success: generate a session record with a random token and respond with the token
+        return res.json({token: await createSession(account.id, customer.id) })
       }
     }
   } catch (e) {
+    console.log(e)
     return next(new Error(e));
   }
   // Unauthorized (HTTP 401)
@@ -70,19 +71,31 @@ router.post('/login', async (req, res, next) => {
   return next(err);
 });
 
-// Generates a signed JWT that encodes a account ID
-// This function requires:
-//  - accountId: account to include in the token
-//  - customerID: customer to include in the token
-function generateToken(accountId, customerId) {
-  // Include some data and an expiration timestamp in the JWT
-  return jwt.sign(
-    {
-      exp: Math.floor(Date.now() / 1000) + 60 * 60, // This key expires in 1 hour
-      data: {accountId, customerId},
-    },
-    config.jwtSecret
-  );
+// Log a user out by removing their session record
+router.post('/logout', async (req, res, next) => {
+  await removeSessions({ token: getRequestToken(req) });
+});
+
+// Create a database record mapping a random session token
+// to an account and customer.
+async function createSession(accountId, customerId) {
+  // Remove any existing sessions for this account.  This is partially just to
+  // avoid filling the database with stale entries, but preventing a user from
+  // having more than one simultaneous session also provides a potential
+  // security benefit in that stolen sessions can't persist past a new
+  // legitimate login.
+  await removeSessions({accountId});
+
+  // Create the new session
+  const token = crypto.randomBytes(16).toString('base64');
+  const timestamp = Date.now() / 1000;
+  await db('sessions').insert({ token, accountId, customerId, timestamp });
+  return token
+}
+
+// Remove all session records associated with a particular token, accountId, etc.
+async function removeSessions(criteria) {
+  return db('sessions').where(criteria).del();
 }
 
 module.exports = router;

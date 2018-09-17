@@ -17,7 +17,7 @@
 
 const config = require('../../config');
 const router = require('express').Router();
-const verifyToken = require('../middleware/verifyToken');
+const verifySession = require('../middleware/session').middleware;
 const stripe = require('stripe')(config.stripe.secretKey);
 const Account = require('../models/Account');
 const Customer = require('../models/Customer');
@@ -29,7 +29,7 @@ router.get('/environment', async (req, res, next) => {
 });
 
 // Get the account for this user
-router.get('/account', verifyToken, async (req, res, next) => {
+router.get('/account', verifySession, async (req, res, next) => {
   const {accountId} = res.locals;
   try {
     // Get this account as JSON
@@ -47,7 +47,7 @@ router.get('/account', verifyToken, async (req, res, next) => {
 });
 
 // Get the subscription for the current user
-router.get('/subscription', verifyToken, async (req, res, next) => {
+router.get('/subscription', verifySession, async (req, res, next) => {
   const {customerId} = res.locals;
   try {
     // Get the subscription for this customer as JSON
@@ -60,7 +60,7 @@ router.get('/subscription', verifyToken, async (req, res, next) => {
 });
 
 // Create a subscription.
-router.post('/subscription', verifyToken, async (req, res, next) => {
+router.post('/subscription', verifySession, async (req, res, next) => {
   const {customerId} = res.locals;
   // This route expects the body parameters:
   //   - plan: the primary plan for the subscription
@@ -83,7 +83,7 @@ router.post('/subscription', verifyToken, async (req, res, next) => {
 });
 
 // Update a subscription.
-router.patch('/subscription', verifyToken, async (req, res, next) => {
+router.patch('/subscription', verifySession, async (req, res, next) => {
   const {customerId} = res.locals;
   // This route expects the body parameters:
   //   - plan: the primary plan for the subscription
@@ -105,7 +105,7 @@ router.patch('/subscription', verifyToken, async (req, res, next) => {
 });
 
 // Cancel the user's subscription
-router.delete('/subscription', verifyToken, async (req, res, next) => {
+router.delete('/subscription', verifySession, async (req, res, next) => {
   const {customerId} = res.locals;
   try {
     // Get the subscription for this customer
@@ -119,7 +119,7 @@ router.delete('/subscription', verifyToken, async (req, res, next) => {
 });
 
 // Request invoices via email for the user
-router.post('/invoices/subscribe', verifyToken, async (req, res, next) => {
+router.post('/invoices/subscribe', verifySession, async (req, res, next) => {
   const {customerId} = res.locals;
   try {
     // Get the customer's subscription
@@ -132,7 +132,7 @@ router.post('/invoices/subscribe', verifyToken, async (req, res, next) => {
 });
 
 // Get the upcoming invoice for the user
-router.get('/invoices/upcoming', verifyToken, async (req, res, next) => {
+router.get('/invoices/upcoming', verifySession, async (req, res, next) => {
   const {customerId} = res.locals;
   try {
     // Get the customer's subscription
@@ -154,7 +154,7 @@ router.get('/invoices/upcoming', verifyToken, async (req, res, next) => {
 
 // Update the fonts used by this account
 //  - fonts: a comma-separated string of font ids
-router.post('/fonts', verifyToken, async (req, res, next) => {
+router.post('/fonts', verifySession, async (req, res, next) => {
   const {customerId} = res.locals;
   const {fonts} = req.body;
   try {
@@ -170,7 +170,7 @@ router.post('/fonts', verifyToken, async (req, res, next) => {
 
 // Record usage for a metered subscription
 //  - numRequests: the number of requests to record
-router.post('/usage', verifyToken, async (req, res, next) => {
+router.post('/usage', verifySession, async (req, res, next) => {
   const {customerId} = res.locals;
   // This route expects the body parameters:
   //   - numRequests: the number of requests for this usage period
@@ -193,7 +193,7 @@ router.post('/usage', verifyToken, async (req, res, next) => {
 });
 
 // Update the payment source
-router.post('/source', verifyToken, async (req, res, next) => {
+router.post('/source', verifySession, async (req, res, next) => {
   const {customerId} = res.locals;
   // This route expects the body parameters:
   //   - source: Stripe Source (created by Stripe Elements on the frontend)
@@ -216,7 +216,7 @@ router.post('/source', verifyToken, async (req, res, next) => {
 });
 
 // Delete the payment source
-router.delete('/source', verifyToken, async (req, res, next) => {
+router.delete('/source', verifySession, async (req, res, next) => {
   const {customerId} = res.locals;
   try {
     // Get this customer
