@@ -41,7 +41,7 @@ export default {
       this.showingDropdown = !this.showingDropdown;
       e.stopPropagation();
     },
-    logout: function() {
+    logout: async function() {
       store.logout();
     },
   },

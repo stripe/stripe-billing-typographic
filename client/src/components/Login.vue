@@ -88,13 +88,18 @@ export default {
 
       // Update the button state
       this.loggingIn = true
+
+      // clear any existing local session info
+      store.authenticated = false;
+      auth.clearToken()
+
       try {
         // Server: create a new account / log in with the provided credentials
-        //   - returns a JWT token for the user.
+        //   - returns a session token for the user.
         const authResponse = await axios.post(apiRoute, {email, password});
         // Authentication success
         store.authenticated = true;
-        // Store the JWT from the server
+        // Store the token from the server
         auth.setToken(authResponse.data.token);
         // Local store: update the user from the API
         const updatedUser = await store.fetchUser();

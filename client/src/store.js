@@ -109,7 +109,7 @@ const store = {
   defaultFontSample: '',
   fontSample: '',
   fontSize: '40',
-  authenticated: auth.hasValidToken(),
+  authenticated: auth.loggedIn(),
   email: '',
   subscription: null,
   source: null,
@@ -223,7 +223,7 @@ store.defaultFontSample = store.randomQuote();
 store.fontSample = store.defaultFontSample;
 // Get the Stripe key
 store.getStripeKey();
-// If we have a JWT stored, add a header all requests identifying the user
+// If we have a session token stored, add a header all requests identifying the user
 auth.setHeader();
 
 export default store;
