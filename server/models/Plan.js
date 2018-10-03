@@ -190,11 +190,11 @@ class Plan extends Model {
             tiers: [
               {
                 up_to: plan.included,
-                amount: 0,
+                unit_amount: 0,
               },
               {
                 up_to: 'inf',
-                amount: plan.amount,
+                unit_amount: plan.amount,
               },
             ],
           });
