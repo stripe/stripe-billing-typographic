@@ -36,7 +36,7 @@ module.exports = {
     publicKey: process.env.STRIPE_PUBLISHABLE_KEY,
     secretKey: process.env.STRIPE_SECRET_KEY,
   },
-  // Configuration for Knex using a s
+  // Configuration for Knex using a sqlite3 database
   database: {
     client: 'sqlite3',
     connection: {
@@ -45,6 +45,4 @@ module.exports = {
     // Use `null` for any default values in SQLite
     useNullAsDefault: true,
   },
-  // Secret for generating JSON web tokens: this can be any very long random string
-  jwtSecret: process.env.JWT_SECRET,
 };

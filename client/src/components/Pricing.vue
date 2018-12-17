@@ -29,7 +29,8 @@
           </div>
           <p>plan and use <input type="number" v-model.number="estimatedRequests"> requests,
           your bill will be <span v-text="estimatedTotalCost"></span>.
-        </p>
+          </p>
+        </div>
       </div>
     </div>
   </section>

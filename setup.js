@@ -39,7 +39,7 @@ const {exec} = require('child_process');
 module.exports = {
   running: false,
   async checkTables() {
-    for (let table of ['accounts', 'customers', 'subscriptions', 'plans']) {
+    for (let table of ['accounts', 'customers', 'subscriptions', 'plans', 'sessions']) {
       const hasTable = await knex.schema.hasTable(table);
       if (!hasTable) {
         return false;
@@ -91,6 +91,7 @@ async function dropTables() {
     knex.schema.dropTableIfExists('customers'),
     knex.schema.dropTableIfExists('subscriptions'),
     knex.schema.dropTableIfExists('plans'),
+    knex.schema.dropTableIfExists('sessions'),
   ]);
 }
 
@@ -140,6 +141,12 @@ async function createTables() {
       t.string('type');
       t.integer('amount');
       t.float('included');
+    }),
+    knex.schema.createTable('sessions', t => {
+      t.string('token');
+      t.string('accountId');
+      t.string('customerId');
+      t.integer('timestamp');
     }),
   ]);
   console.log('✅  Database is ready');

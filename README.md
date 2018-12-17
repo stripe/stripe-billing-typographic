@@ -28,7 +28,7 @@ Typographic is a complete, full-stack example of a Stripe Billing integration:
 🌏|**Vue.js frontend.** Single-page [Vue](https://vuejs.org) app demonstrating how to use Elements in a component-based web framework.
 ☕️|**Node.js backend.** An [Express](https://expressjs.com/) server manages billing and user data between the database and Stripe's API.
 📦|**Database support.** Uses [Knex.js](http://knexjs.org/) and [SQLite](https://www.sqlite.org/index.html) (by default) to demonstrate a data modeling pattern for the [Billing](https://stripe.com/docs/billing/quickstart) API.
-🔑|**User authentication.** JSON web tokens ([JWT](https://jwt.io/)) and an Express authentication scheme are included for user login and registration.
+🔑|**User authentication.** An Express authentication scheme is included for user login and registration.
 
 ## Stripe Billing Integration
 
@@ -66,10 +66,7 @@ Install dependencies using npm (or yarn):
 npm install
 ```
 
-Copy the example .env file. You'll need to fill out two details:
-
-- Your [Stripe API keys](https://dashboard.stripe.com/account/apikeys)
-- A random 20-character string to keep user authentication secure (using [JSON Web Tokens](https://jwt.io))
+Copy the example .env file, and fill in your [Stripe API keys](https://dashboard.stripe.com/account/apikeys).
 
 ```
 cp .env.example .env
