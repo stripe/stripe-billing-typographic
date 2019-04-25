@@ -83,6 +83,7 @@
             <div class="upgrade-plan" v-if="extraRequests > 0">
               <p>Want to increase your included requests?</p>
               <button class="upgrade" @click="$router.push('/pricing')">Upgrade your plan</button>
+            </div>
           </div>
         </section>
       </template>
