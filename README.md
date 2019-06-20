@@ -75,9 +75,11 @@ Copy the example .env file. You'll need to fill out two details:
 cp .env.example .env
 ```
 
-If this is your first time running the app, you'll need to set up the app:
+If this is your first time running the app, you'll need to set up the app 
+and build the resources, i.e. vue components (client/assets/bundle.js):
 ```
 npm run setup
+npm run build
 ```
 
 Run the app:
