@@ -194,13 +194,13 @@ class Customer extends Model {
           subscription.stripeId,
           {
             default_payment_method: paymentMethodId,
-            collection_method: 'charge_automatically',
+            collection_method: collectionMethod,
           }
         );
 
         const updatedBilling = await db(Subscription.table)
           .where('id', subscription.id)
-          .update({collectionMethod: 'charge_automatically'});
+          .update({collectionMethod: collectionMethod});
       }
 
       // Return the payment method we updated
