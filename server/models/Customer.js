@@ -10,10 +10,10 @@
  *  - email: the email associated with the account
  *  - fonts: a comma-separated string of fonts used for this account
  *  - stripeId: the id of the Stripe Customer object
- *  - sourceId: the id of the customer's payment source,
- *    based on a Stripe Source object
- *  - sourceLast4: the last four digits of a payment source
- *  - sourceBrand: the brand of the payment source, e.g. 'visa',
+ *  - paymentMethodId: the id of the customer's payment method,
+ *    based on a Stripe paymentMethod object
+ *  - paymentMethodLast4: the last four digits of a payment method
+ *  - paymentMethodBrand: the brand of the payment method, e.g. 'visa',
  *    'mastercard', or 'amex'
  *
  * The Customer model has a few relations to other models:
@@ -40,9 +40,9 @@ class Customer extends Model {
     this.accountId = opts.accountId;
     this.email = opts.email;
     this.fonts = opts.fonts;
-    this.sourceId = opts.sourceId;
-    this.sourceLast4 = opts.sourceLast4;
-    this.sourceBrand = opts.sourceBrand;
+    this.paymentMethodId = opts.paymentMethodId;
+    this.paymentMethodLast4 = opts.paymentMethodLast4;
+    this.paymentMethodBrand = opts.paymentMethodBrand;
   }
 
   // Get a Customer by id from the database
@@ -101,12 +101,12 @@ class Customer extends Model {
       email: this.email,
       fonts: this.fonts,
     };
-    // If this Customer has a Source, include its properties in the JSON output
-    if (this.sourceId) {
-      json.source = {
-        id: this.sourceId,
-        last4: this.sourceLast4,
-        brand: this.sourceBrand,
+    // If this Customer has a PaymentMethod, include its properties in the JSON output
+    if (this.paymentMethodId) {
+      json.paymentMethod = {
+        id: this.paymentMethodId,
+        last4: this.paymentMethodLast4,
+        brand: this.paymentMethodBrand,
       };
     }
 
@@ -166,67 +166,65 @@ class Customer extends Model {
     }
   }
 
-  // Update the payment source for the customer (and make it the default)
-  async updateSource(source) {
+  async updatePaymentMethod(paymentMethodId) {
     try {
-      // Stripe API: Attach the new source, update the default source
-      const createdSource = await stripe.customers.createSource(this.stripeId, {
-        source: source.id,
-      });
-      const updatedCustomer = await stripe.customers.update(this.stripeId, {
-        default_source: createdSource.id,
-      });
+      // Attach PaymentMethod to Customer
+      const { card } = await stripe.paymentMethods.attach(
+        paymentMethodId,
+        { customer: this.stripeId }
+      );
 
-      // DB: Update the payment source ID
+      // DB: Update the payment method ID
       const updated = await db(this.constructor.table)
         .where('id', this.id)
         .update({
-          sourceId: createdSource.id,
-          sourceLast4: createdSource.last4,
-          sourceBrand: createdSource.brand,
+          paymentMethodId: paymentMethodId,
+          paymentMethodLast4: card.last4,
+          paymentMethodBrand: card.brand,
         });
 
-      // Update our subscription to charge automatically: we've got a source
+      // Fetch Subscription
       const subscription = await this.getSubscription();
-      const paymentMethod = 'charge_automatically';
-      // Update the payment method if it changed
-      if (subscription && subscription.billing != paymentMethod) {
-        // Update the payment method if it changed
+      
+      const collectionMethod = 'charge_automatically';
+
+      if (subscription && subscription.collectionMethod != collectionMethod) {
+        // Make PaymentMethod the default for Subscription
         const updatedSubscription = await stripe.subscriptions.update(
           subscription.stripeId,
-          {billing: paymentMethod}
+          {
+            default_payment_method: paymentMethodId,
+            collection_method: 'charge_automatically',
+          }
         );
+
         const updatedBilling = await db(Subscription.table)
           .where('id', subscription.id)
-          .update({billing: paymentMethod});
+          .update({collectionMethod: 'charge_automatically'});
       }
 
-      // Return the payment source we updated
+      // Return the payment method we updated
       return {
-        id: createdSource.id,
-        last4: createdSource.last4,
-        brand: createdSource.brand,
+        paymentMethodId: paymentMethodId,
+        paymentMethodLast4: card.last4,
+        paymentMethodBrand: card.brand,
       };
     } catch (e) {
       throw new Error(e);
     }
   }
 
-  // Remove a payment source for the customer
-  async removeSource() {
+  async removePaymentMethod(paymentMethodId) {
     try {
-      // Stripe API: Remove the default source
-      const updatedCustomer = await stripe.customers.deleteSource(
-        this.stripeId,
-        this.sourceId
-      );
-      // DB: Remove the payment source
-      const removed = await db(this.constructor.table)
+      // Stripe API: Remove the default payment method
+      await stripe.paymentMethods.detach(paymentMethodId);
+      
+      await db(this.constructor.table)
         .where('id', this.id)
         .update({
-          sourceId: '',
-          sourceLast4: '',
-          sourceBrand: '',
+          paymentMethodId: '',
+          paymentMethodLast4: '',
+          paymentMethodBrand: '',
         });
     } catch (e) {
       throw new Error(e);

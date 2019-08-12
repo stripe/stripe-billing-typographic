@@ -7,7 +7,7 @@
  * A Stripe Billing integration typically includes the follow:
  *   - Local user accounts for each Customer
  *   - Routes for managing a user's Subscription, using a Plan
- *   - Routes for managing a user's Source for their payment method
+ *   - Routes for managing a user's Payment Method
  *   - A route to view past Invoices
  *   - A route to provide the next upcoming Invoice
  *   - If you're using metered billing, a route to record new metered usage
@@ -134,6 +134,7 @@ router.post('/invoices/subscribe', verifyToken, async (req, res, next) => {
 // Get the upcoming invoice for the user
 router.get('/invoices/upcoming', verifyToken, async (req, res, next) => {
   const {customerId} = res.locals;
+
   try {
     // Get the customer's subscription
     const customer = await Customer.getById(customerId);
@@ -143,7 +144,8 @@ router.get('/invoices/upcoming', verifyToken, async (req, res, next) => {
       return res.send({estimate: 0});
     }
     // Get the invoice for this subscription
-    const invoice = await stripe.invoices.retrieveUpcoming(customer.stripeId, {
+    const invoice = await stripe.invoices.retrieveUpcoming({
+      customer: customer.stripeId,
       subscription: subscription.stripeId,
     });
     return res.send({estimate: invoice.total});
@@ -192,39 +194,37 @@ router.post('/usage', verifyToken, async (req, res, next) => {
   }
 });
 
-// Update the payment source
-router.post('/source', verifyToken, async (req, res, next) => {
+router.post('/setup_intent', verifyToken, async (req, res, next) => {
   const {customerId} = res.locals;
-  // This route expects the body parameters:
-  //   - source: Stripe Source (created by Stripe Elements on the frontend)
-  const {source} = req.body;
 
-  if (!source) {
-    return next(
-      new Error('Stripe source required, use the `source` parameter.')
-    );
-  }
   try {
-    // Get this customer
+    // Get the Customer
     const customer = await Customer.getById(customerId);
-    // Update the payment source for this customer
-    const updatedSource = await customer.updateSource(source);
-    return res.send({source: updatedSource});
+
+    // Create a new SetupIntent, for the customer, configured for cards
+    const setupIntent = await stripe.setupIntents.create({
+      payment_method_types: ['card'],
+      customer: customer.stripeId
+    });
+
+    return res.send({clientSecret: setupIntent.client_secret});
   } catch (e) {
     return next(new Error(e));
   }
 });
 
-// Delete the payment source
-router.delete('/source', verifyToken, async (req, res, next) => {
+router.post('/payment_methods/attach', verifyToken, async (req, res, next) => {
   const {customerId} = res.locals;
+
   try {
-    // Get this customer
     const customer = await Customer.getById(customerId);
-    // Remove the customer's payment source
-    const removed = await customer.removeSource();
-    return res.sendStatus(200);
+    const { paymentMethodId } = req.body;
+
+    return res.send(
+      await customer.updatePaymentMethod(paymentMethodId)
+    );
   } catch (e) {
+    console.log(e.message);
     return next(new Error(e));
   }
 });

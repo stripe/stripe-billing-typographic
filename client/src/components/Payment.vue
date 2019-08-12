@@ -44,8 +44,8 @@
         </div>
       </section>
     </section>
-    <button v-if="submittingSource" class="submit loading">Saving payment method...</button>
-    <button v-else-if="paymentMethod === 'card'" class="submit" @click="updateSource()">
+    <button v-if="submittingPaymentMethod" class="submit loading">Saving payment method...</button>
+    <button v-else-if="paymentMethod === 'card'" class="submit" @click="updateDefaultPaymentMethod()">
       <span v-text="hasPaymentMethod ? 'Update' : 'Add'"></span> payment method
     </button>
     <button v-else-if="paymentMethod === 'invoice'" class="submit" @click="subscribeInvoices()">
@@ -73,7 +73,7 @@ export default {
       paymentMethod: 'card',
       card: null,
       elementsError: null,
-      submittingSource: false,
+      submittingPaymentMethod: false,
     };
   },
   async created() {
@@ -83,7 +83,7 @@ export default {
   },
   mounted() {
     // Reset the button state
-    this.submittingSource = false;
+    this.submittingPaymentMethod = false;
     // Set a default payment method
     store.banner.paymentMethod = 'card';
     this.paymentMethod = 'card';
@@ -103,10 +103,10 @@ export default {
     }
   },
   computed: {
-    // Whether this user has a payment source (invoices or card)
+    // Whether this user has a payment method (invoices or card)
     hasPaymentMethod: function() {
       return (
-        store.source ||
+        store.paymentMethod ||
         (store.subscription && store.subscription.billing === 'send_invoice')
       );
     },
@@ -172,7 +172,7 @@ export default {
     // Update the payment method: receive invoices by email
     async subscribeInvoices() {
       // Update the button state
-      this.submittingSource = true;
+      this.submittingPaymentMethod = true;
       try {
         const response = await axios.post('/api/invoices/subscribe');
         // If we have an active subscription, update the billing method to use invoices
@@ -184,31 +184,37 @@ export default {
         console.log(`Couldn't request an invoice: ${e}`);
       }
     },
-    // Update the payment method: add / replace a Source (in this case, a credit card)
-    async updateSource() {
-      // Update the button state
-      this.submittingSource = true;
-      const {token, error} = await store.stripe.createToken(this.card);
+    // Update the payment method: add / replace a PaymentMethod (in this case, a credit card)
+    async updateDefaultPaymentMethod() {
+      this.submittingPaymentMethod = true;
 
-      if (error) {
-        // Inform the user of an error
-        this.elementsError = error.message;
-        // Reset the button state
-        this.submittingSource = false;
-      } else {
-        try {
-          // Submit the source we received to our backend
-          const response = await axios.post('/api/source', {source: token});
-          // Update our local store and change to the account view
-          store.source = response.data.source;
-          // If we have an active subscription, update billing method to charge automatically
-          if (store.subscription) {
-            store.subscription.billing = 'charge_automatically';
-          }
-          this.$router.push('account');
-        } catch (e) {
-          console.log(`Couldn't add payment source: ${e}`);
+      try {
+        // Fetch new PaymentMethod
+        const {data} = await axios.post('/api/setup_intent');
+
+        // Optimise PaymentMethod for off-session
+        const {setupIntent, error} = await store.stripe.handleCardSetup(data.clientSecret, this.card);
+
+        // Attach to Customer and Subscription
+        const response = await axios.post('/api/payment_methods/attach', {
+          paymentMethodId: setupIntent.payment_method
+        });
+
+        // Set id, brand, last4 in Store
+        store.paymentMethod = {
+          id: response.data.paymentMethodId,
+          brand: response.data.paymentMethodBrand,
+          last4: response.data.paymentMethodLast4,
+        };
+
+        // Update our local store and change to account view.
+        if (store.subscription) {
+          store.subscription.collectionMethod = 'charge_automatically';
         }
+
+        this.$router.push('account');
+      } catch (e) {
+        console.log(`Couldn't add payment method: ${e}`);
       }
     },
     changePlan() {

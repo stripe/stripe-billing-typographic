@@ -112,7 +112,7 @@ const store = {
   authenticated: auth.hasValidToken(),
   email: '',
   subscription: null,
-  source: null,
+  paymentMethod: null,
   nextBillingEstimate: null,
   logout() {
     // Clear the user's authentication credentials
@@ -122,7 +122,7 @@ const store = {
     store.authenticated = false;
     store.email = '';
     store.subscription = null;
-    store.source = null;
+    store.paymentMethod = null;
     // Redirect to the fonts view
     this.router.push('/');
   },
@@ -168,14 +168,14 @@ const store = {
         this.logout();
         return;
       }
-      // Update the local store: email, payment source, fonts, and subscription
+      // Update the local store: email, payment methods, fonts, and subscription
       store.email = account.email;
       if (account.customer.fonts) {
         Vue.set(store, 'selectedFonts', account.customer.fonts.split(','));
       } else {
         Vue.set(store, 'selectedFonts', []);
       }
-      Vue.set(store, 'source', account.customer.source);
+      Vue.set(store, 'paymentMethod', account.customer.paymentMethod);
       if (account.customer.subscription) {
         Vue.set(store, 'subscription', account.customer.subscription);
       }

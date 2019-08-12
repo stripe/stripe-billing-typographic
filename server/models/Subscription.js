@@ -138,12 +138,12 @@ class Subscription extends Model {
           },
         ],
       };
-      // If we have a payment source, charge it
+      // If we have a payment method, charge it
       // automatically. Otherwise, we send a hosted invoice via email.
-      if (customer.sourceId) {
-        stripeSub.billing = 'charge_automatically';
+      if (customer.paymentMethodId) {
+        stripeSub.collection_method = 'charge_automatically';
       } else {
-        stripeSub.billing = 'send_invoice';
+        stripeSub.collection_method = 'send_invoice';
         stripeSub.days_until_due = 30;
       }
       // Stripe: Create the subscription

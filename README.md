@@ -37,7 +37,7 @@ This repository includes two components:
   - [Vue.js application][client] with a front-end interface for the web service.
 
 Here are a few key files where we interact with Stripe's platform:
-  - [`server/models`][]: Defines our database models and includes all the server-side interaction with [Billing](https://stripe.com/billing) and [Sources](https://stripe.com/docs/sources).
+  - [`server/models`][]: Defines our database models and includes all the server-side interaction with [Billing](https://stripe.com/billing) and [the PaymentMethods API](https://stripe.com/docs/payments/payment-methods).
   - [`server/models/Plan.js`][]: The [`setupPlans`][] method creates and manages the [Products and Plans](https://stripe.com/docs/billing/subscriptions/products-and-plans) for our Stripe account.
   - [`server/routes/stripeRoutes.js`][]: Express API routes for all payments and billing actions for our front-end app.
   - [`client/src/components/Payment.vue`][]: Vue front-end component for payment options, which includes an [Element](https://stripe.com/elements) to collect credit-card details.
