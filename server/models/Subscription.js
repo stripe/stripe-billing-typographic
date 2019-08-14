@@ -252,11 +252,13 @@ class Subscription extends Model {
       // JavaScript's timestamps are in milliseconds, but Stripe's API uses seconds
       const timestamp = Math.floor(new Date().getTime() / 1000);
       // Stripe: Update the usage for the metered subscription
-      const usageRecord = await stripe.usageRecords.create({
-        quantity: numRequests,
-        timestamp,
-        subscription_item: this.stripeMeteredSubId,
-      });
+      await stripe.subscriptionItems.createUsageRecord(
+        this.stripeMeteredSubId,
+        {
+          quantity: numRequests,
+          timestamp,
+        }
+      );
 
       // DB: Update the database with the new metered usage numbers
       const totalRequests = this.meteredUsage + numRequests;
