@@ -224,7 +224,6 @@ router.post('/payment_methods/attach', verifyToken, async (req, res, next) => {
       await customer.updatePaymentMethod(paymentMethodId)
     );
   } catch (e) {
-    console.log(e.message);
     return next(new Error(e));
   }
 });
