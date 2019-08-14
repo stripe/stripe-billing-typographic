@@ -195,24 +195,31 @@ export default {
         // Optimise PaymentMethod for off-session
         const {setupIntent, error} = await store.stripe.handleCardSetup(data.clientSecret, this.card);
 
-        // Attach to Customer and Subscription
-        const response = await axios.post('/api/payment_methods/attach', {
-          paymentMethodId: setupIntent.payment_method
-        });
+        if (error) {
+          this.elementsError = error.message;
+          this.submittingPaymentMethod = false;
+        } else {
+          // Attach to Customer and Subscription
+          const response = await axios.post('/api/payment_methods/attach', {
+            paymentMethodId: setupIntent.payment_method
+          });
 
-        // Set id, brand, last4 in Store
-        store.paymentMethod = {
-          id: response.data.paymentMethodId,
-          brand: response.data.paymentMethodBrand,
-          last4: response.data.paymentMethodLast4,
-        };
+          // Set id, brand, last4 in Store
+          store.paymentMethod = {
+            id: response.data.paymentMethodId,
+            brand: response.data.paymentMethodBrand,
+            last4: response.data.paymentMethodLast4,
+          };
 
-        // Update our local store and change to account view.
-        if (store.subscription) {
-          store.subscription.collectionMethod = 'charge_automatically';
+          // Update our local store and change to account view.
+          if (store.subscription) {
+            store.subscription.collectionMethod = 'charge_automatically';
+          }
+
+          this.$router.push('account');
         }
 
-        this.$router.push('account');
+
       } catch (e) {
         console.log(`Couldn't add payment method: ${e}`);
       }
