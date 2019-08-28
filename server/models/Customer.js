@@ -185,30 +185,29 @@ class Customer extends Model {
 
       // Fetch Subscription
       const subscription = await this.getSubscription();
-      
-      const collectionMethod = 'charge_automatically';
 
-      if (subscription && subscription.collectionMethod != collectionMethod) {
+      if (subscription) {
         // Make PaymentMethod the default for Subscription
         const updatedSubscription = await stripe.subscriptions.update(
           subscription.stripeId,
           {
             default_payment_method: paymentMethodId,
-            collection_method: collectionMethod,
+            collection_method: 'charge_automatically',
+            expand: ['pending_setup_intent'],
           }
         );
 
         const updatedBilling = await db(Subscription.table)
           .where('id', subscription.id)
-          .update({collectionMethod: collectionMethod});
+          .update({collectionMethod: 'charge_automatically'});
+
+        // If the PaymentMethod needs optimising, pass the client secret
+        if (updatedSubscription.pending_setup_intent) {
+          return { clientSecret: updatedSubscription.pending_setup_intent.client_secret };
+        }
       }
 
-      // Return the payment method we updated
-      return {
-        paymentMethodId: paymentMethodId,
-        paymentMethodLast4: card.last4,
-        paymentMethodBrand: card.brand,
-      };
+      return {};
     } catch (e) {
       throw new Error(e);
     }

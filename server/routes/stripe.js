@@ -118,6 +118,22 @@ router.delete('/subscription', verifyToken, async (req, res, next) => {
   }
 });
 
+// Update the subscription's payment method
+router.post('/subscription/payment_method', verifyToken, async (req, res, next) => {
+  const {customerId} = res.locals;
+
+  try {
+    const customer = await Customer.getById(customerId);
+    const { paymentMethodId } = req.body;
+
+    return res.send(
+      await customer.updatePaymentMethod(paymentMethodId)
+    );
+  } catch (e) {
+    return next(new Error(e));
+  }
+});
+
 // Request invoices via email for the user
 router.post('/invoices/subscribe', verifyToken, async (req, res, next) => {
   const {customerId} = res.locals;
@@ -189,40 +205,6 @@ router.post('/usage', verifyToken, async (req, res, next) => {
     // Record usage for this subscription
     const totalUsage = await subscription.recordUsage(numRequests);
     return res.send({numRequests: totalUsage});
-  } catch (e) {
-    return next(new Error(e));
-  }
-});
-
-router.post('/setup_intent', verifyToken, async (req, res, next) => {
-  const {customerId} = res.locals;
-
-  try {
-    // Get the Customer
-    const customer = await Customer.getById(customerId);
-
-    // Create a new SetupIntent, for the customer, configured for cards
-    const setupIntent = await stripe.setupIntents.create({
-      payment_method_types: ['card'],
-      customer: customer.stripeId
-    });
-
-    return res.send({clientSecret: setupIntent.client_secret});
-  } catch (e) {
-    return next(new Error(e));
-  }
-});
-
-router.post('/payment_methods/attach', verifyToken, async (req, res, next) => {
-  const {customerId} = res.locals;
-
-  try {
-    const customer = await Customer.getById(customerId);
-    const { paymentMethodId } = req.body;
-
-    return res.send(
-      await customer.updatePaymentMethod(paymentMethodId)
-    );
   } catch (e) {
     return next(new Error(e));
   }

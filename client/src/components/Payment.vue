@@ -45,7 +45,7 @@
       </section>
     </section>
     <button v-if="submittingPaymentMethod" class="submit loading">Saving payment method...</button>
-    <button v-else-if="paymentMethod === 'card'" class="submit" @click="updateDefaultPaymentMethod()">
+    <button v-else-if="paymentMethod === 'card'" class="submit" @click="updatePaymentMethod()">
       <span v-text="hasPaymentMethod ? 'Update' : 'Add'"></span> payment method
     </button>
     <button v-else-if="paymentMethod === 'invoice'" class="submit" @click="subscribeInvoices()">
@@ -184,42 +184,47 @@ export default {
         console.log(`Couldn't request an invoice: ${e}`);
       }
     },
-    // Update the payment method: add / replace a PaymentMethod (in this case, a credit card)
-    async updateDefaultPaymentMethod() {
+    async updatePaymentMethod() {
       this.submittingPaymentMethod = true;
 
       try {
-        // Fetch new PaymentMethod
-        const {data} = await axios.post('/api/setup_intent');
+        // Create a new PaymentMethod object
+        const { paymentMethod, error } = await store.stripe.createPaymentMethod('card', this.card);
 
-        // Optimise PaymentMethod for off-session
-        const {setupIntent, error} = await store.stripe.handleCardSetup(data.clientSecret, this.card);
-
+        // If there's an error, print to screen
         if (error) {
           this.elementsError = error.message;
           this.submittingPaymentMethod = false;
+          throw error;
         } else {
-          // Attach to Customer and Subscription
-          const response = await axios.post('/api/payment_methods/attach', {
-            paymentMethodId: setupIntent.payment_method
+          // Attach PaymentMethod to Subscription on back-end
+          const { data } = await axios.post('/api/subscription/payment_method', {
+            paymentMethodId: paymentMethod.id,
           });
+
+          // SetupIntent needs optimising
+          if (data.clientSecret) {
+            const { setupIntent, setupIntentError } = await store.stripe.handleCardSetup(data.clientSecret);
+
+            if (setupIntentError) {
+              this.elementsError = error.message;
+              this.submittingPaymentMethod = false;
+              throw setupIntentError;
+            }
+          }
 
           // Set id, brand, last4 in Store
           store.paymentMethod = {
-            id: response.data.paymentMethodId,
-            brand: response.data.paymentMethodBrand,
-            last4: response.data.paymentMethodLast4,
+            id: paymentMethod.id,
+            brand: paymentMethod.card.brand,
+            last4: paymentMethod.card.last4,
           };
 
           // Update our local store and change to account view.
-          if (store.subscription) {
-            store.subscription.collectionMethod = 'charge_automatically';
-          }
+          if (store.subscription) store.subscription.collectionMethod = 'charge_automatically';
 
           this.$router.push('account');
         }
-
-
       } catch (e) {
         console.log(`Couldn't add payment method: ${e}`);
       }
