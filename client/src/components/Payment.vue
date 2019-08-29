@@ -226,7 +226,7 @@ export default {
           this.$router.push('account');
         }
       } catch (e) {
-        console.log(`Couldn't add payment method: ${e}`);
+        console.log(`Couldn't add payment method: ${e.message}`);
       }
     },
     changePlan() {
