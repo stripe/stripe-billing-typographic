@@ -204,12 +204,12 @@ export default {
 
           // SetupIntent needs optimising
           if (data.clientSecret) {
-            const { setupIntent, setupIntentError } = await store.stripe.handleCardSetup(data.clientSecret);
+            const result = await store.stripe.handleCardSetup(data.clientSecret);
 
-            if (setupIntentError) {
-              this.elementsError = error.message;
+            if (result.error) {
+              this.elementsError = result.error.message;
               this.submittingPaymentMethod = false;
-              throw setupIntentError;
+              throw result.error;
             }
           }
 
