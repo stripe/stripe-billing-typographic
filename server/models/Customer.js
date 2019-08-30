@@ -241,13 +241,13 @@ class Customer extends Model {
         const updatedSubscription = await stripe.subscriptions.update(
           subscription.stripeId,
           {
-            billing: collectionMethod,
+            collection_method: collectionMethod,
             days_until_due: 30,
           }
         );
         const updatedBilling = await db(Subscription.table)
           .where('id', subscription.id)
-          .update({billing: collectionMethod});
+          .update({collectionMethod: collectionMethod});
         return {};
       }
     } catch (e) {

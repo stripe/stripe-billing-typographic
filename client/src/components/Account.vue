@@ -25,7 +25,7 @@
       <section class="account-item">
         <h2>Payment</h2>
         <div class="details payment-details">
-          <template v-if="store.paymentMethod.id && store.subscription.collectionMethod === 'charge_automatically'">
+          <template v-if="store.paymentMethod && store.subscription.collectionMethod === 'charge_automatically'">
             <div :class="['card-brand', store.paymentMethod.brand.toLowerCase()]"></div>
             <p class="last4">&bull;&bull;&bull;&bull;{{store.paymentMethod.last4}}</p>
           </template>

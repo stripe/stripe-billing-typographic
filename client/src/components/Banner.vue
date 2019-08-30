@@ -63,7 +63,7 @@ export default {
       store,
       currentRoute: null,
       clipboard: null,
-      testCardNumber: '4242 4242 4242 4242',
+      testCardNumber: '4000 0025 0000 3155',
     };
   },
   // Get the current route and show the right banner when the component mounts
