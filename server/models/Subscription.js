@@ -49,7 +49,7 @@ class Subscription extends Model {
     this.createdAt = opts.createdAt;
     this.status = opts.status;
     this.plan = opts.plan;
-    this.billing = opts.billing;
+    this.collectionMethod = opts.collectionMethod;
     this.currentPeriodEnd = opts.currentPeriodEnd;
     this.currentPeriodStart = opts.currentPeriodStart;
     this.meteredUsage = opts.meteredUsage;
@@ -94,7 +94,7 @@ class Subscription extends Model {
       createdAt: this.createdAt,
       status: this.status,
       plan: this.plan,
-      billing: this.billing,
+      collectionMethod: this.collectionMethod,
       currentPeriodEnd: this.currentPeriodEnd,
       currentPeriodStart: this.currentPeriodStart,
       meteredUsage: this.meteredUsage,
@@ -138,12 +138,12 @@ class Subscription extends Model {
           },
         ],
       };
-      // If we have a payment source, charge it
+      // If we have a payment method, charge it
       // automatically. Otherwise, we send a hosted invoice via email.
-      if (customer.sourceId) {
-        stripeSub.billing = 'charge_automatically';
+      if (customer.paymentMethodId) {
+        stripeSub.collection_method = 'charge_automatically';
       } else {
-        stripeSub.billing = 'send_invoice';
+        stripeSub.collection_method = 'send_invoice';
         stripeSub.days_until_due = 30;
       }
       // Stripe: Create the subscription
@@ -252,11 +252,13 @@ class Subscription extends Model {
       // JavaScript's timestamps are in milliseconds, but Stripe's API uses seconds
       const timestamp = Math.floor(new Date().getTime() / 1000);
       // Stripe: Update the usage for the metered subscription
-      const usageRecord = await stripe.usageRecords.create({
-        quantity: numRequests,
-        timestamp,
-        subscription_item: this.stripeMeteredSubId,
-      });
+      await stripe.subscriptionItems.createUsageRecord(
+        this.stripeMeteredSubId,
+        {
+          quantity: numRequests,
+          timestamp,
+        }
+      );
 
       // DB: Update the database with the new metered usage numbers
       const totalRequests = this.meteredUsage + numRequests;

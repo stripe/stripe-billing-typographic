@@ -114,9 +114,9 @@ async function createTables() {
       t.string('email');
       t.integer('createdAt');
       t.string('fonts');
-      t.string('sourceId');
-      t.string('sourceLast4');
-      t.string('sourceBrand');
+      t.string('paymentMethodId');
+      t.string('paymentMethodLast4');
+      t.string('paymentMethodBrand');
     }),
     knex.schema.createTable('subscriptions', t => {
       t.increments();
@@ -125,7 +125,7 @@ async function createTables() {
       t.integer('createdAt');
       t.string('status');
       t.string('plan');
-      t.string('billing');
+      t.string('collectionMethod');
       t.integer('currentPeriodEnd');
       t.integer('currentPeriodStart');
       t.float('meteredUsage').unsigned();

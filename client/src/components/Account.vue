@@ -25,14 +25,14 @@
       <section class="account-item">
         <h2>Payment</h2>
         <div class="details payment-details">
-          <template v-if="store.source">
-            <div :class="['card-brand', store.source.brand.toLowerCase()]"></div>
-            <p class="last4">&bull;&bull;&bull;&bull;{{store.source.last4}}</p>
+          <template v-if="store.paymentMethod && store.subscription.collectionMethod === 'charge_automatically'">
+            <div :class="['card-brand', store.paymentMethod.brand.toLowerCase()]"></div>
+            <p class="last4">&bull;&bull;&bull;&bull;{{store.paymentMethod.last4}}</p>
           </template>
-          <p v-else-if="store.subscription && store.subscription.billing === 'send_invoice'">
+          <p v-else-if="store.subscription && store.subscription.collectionMethod === 'send_invoice'">
             Invoices will be emailed at the end of the billing cycle.
           </p>
-          <p v-else>No payment source.</p>
+          <p v-else>No payment method.</p>
         </div>
         <button class="update" @click.prevent="changePayment()">Change</button>
       </section>
