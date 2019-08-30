@@ -235,19 +235,19 @@ class Customer extends Model {
     try {
       // Update our subscription to send invoices
       const subscription = await this.getSubscription();
-      const paymentMethod = 'send_invoice';
+      const collectionMethod = 'send_invoice';
       // Update the payment method if it changed
-      if (subscription && subscription.billing != paymentMethod) {
+      if (subscription && subscription.collectionMethod != collectionMethod) {
         const updatedSubscription = await stripe.subscriptions.update(
           subscription.stripeId,
           {
-            billing: paymentMethod,
+            billing: collectionMethod,
             days_until_due: 30,
           }
         );
         const updatedBilling = await db(Subscription.table)
           .where('id', subscription.id)
-          .update({billing: paymentMethod});
+          .update({billing: collectionMethod});
         return {};
       }
     } catch (e) {

@@ -49,7 +49,7 @@ class Subscription extends Model {
     this.createdAt = opts.createdAt;
     this.status = opts.status;
     this.plan = opts.plan;
-    this.billing = opts.billing;
+    this.collectionMethod = opts.collectionMethod;
     this.currentPeriodEnd = opts.currentPeriodEnd;
     this.currentPeriodStart = opts.currentPeriodStart;
     this.meteredUsage = opts.meteredUsage;
@@ -94,7 +94,7 @@ class Subscription extends Model {
       createdAt: this.createdAt,
       status: this.status,
       plan: this.plan,
-      billing: this.billing,
+      collectionMethod: this.collectionMethod,
       currentPeriodEnd: this.currentPeriodEnd,
       currentPeriodStart: this.currentPeriodStart,
       meteredUsage: this.meteredUsage,

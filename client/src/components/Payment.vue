@@ -107,7 +107,7 @@ export default {
     hasPaymentMethod: function() {
       return (
         store.paymentMethod ||
-        (store.subscription && store.subscription.billing === 'send_invoice')
+        (store.subscription && store.subscription.collectionMethod === 'send_invoice')
       );
     },
     // Get the current plan from the local store
@@ -177,7 +177,7 @@ export default {
         const response = await axios.post('/api/invoices/subscribe');
         // If we have an active subscription, update the billing method to use invoices
         if (store.subscription) {
-          store.subscription.billing = 'send_invoice';
+          store.subscription.collectionMethod = 'send_invoice';
         }
         this.$router.push('account');
       } catch (e) {
