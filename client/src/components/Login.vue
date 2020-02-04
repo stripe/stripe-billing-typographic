@@ -8,11 +8,17 @@
       <div class="fields">
         <div class="field">
           <label for="email">Email</label>
-          <input type="text" v-model="email" name="email" ref="email" placeholder="jane@typographic.io">
+          <input
+            type="text"
+            v-model="email"
+            name="email"
+            ref="email"
+            placeholder="jane@typographic.io"
+          />
         </div>
         <div class="field">
           <label for="pw">Password</label>
-          <input type="password" v-model="password" name="password">
+          <input type="password" v-model="password" name="password" />
         </div>
       </div>
       <p v-if="createAccount">
@@ -24,13 +30,15 @@
         <button v-else type="submit" class="submit">Sign in</button>
       </p>
       <p class="caption" v-if="createAccount">
-        Already have an account? <a href="#" @click="createNewAccount(false)">Sign in now.</a>
+        Already have an account?
+        <a href="#" @click="createNewAccount(false)">Sign in now.</a>
       </p>
       <p class="caption" v-else>
-        Don't have an account? <a href="#" @click="createNewAccount(true)">Create one now.</a>
+        Don't have an account?
+        <a href="#" @click="createNewAccount(true)">Create one now.</a>
       </p>
     </form>
-   </section>
+  </section>
 </template>
 
 <script>
@@ -42,26 +50,26 @@
  * to an existing one.
  */
 
-import axios from 'axios';
-import store from '../store';
-import auth from '../auth';
+import axios from "axios";
+import store from "../store";
+import auth from "../auth";
 
 export default {
-  name: 'Login',
+  name: "Login",
   data() {
     return {
       store,
       createAccount: false,
       desiredPlan: null,
-      email: '',
-      password: '',
+      email: "",
+      password: "",
       error: false,
       loggingIn: false
     };
   },
   mounted: function() {
     // Resetting button state
-    this.loggingIn = false
+    this.loggingIn = false;
     // Take keyboard focus
     this.focus();
     // Check the route params: we optionally create a new account
@@ -77,21 +85,21 @@ export default {
       const password = this.password;
 
       if (!email || !password) {
-        this.error = 'Username and password are required.';
+        this.error = "Username and password are required.";
         return;
       }
       // Are we logging in or creating an account? Pick the right API route
-      let apiRoute = '/auth/login';
+      let apiRoute = "/auth/login";
       if (creatingNewAccount) {
-        apiRoute = '/auth/signup';
+        apiRoute = "/auth/signup";
       }
 
       // Update the button state
-      this.loggingIn = true
+      this.loggingIn = true;
       try {
         // Server: create a new account / log in with the provided credentials
         //   - returns a JWT token for the user.
-        const authResponse = await axios.post(apiRoute, {email, password});
+        const authResponse = await axios.post(apiRoute, { email, password });
         // Authentication success
         store.authenticated = true;
         // Store the JWT from the server
@@ -105,16 +113,15 @@ export default {
         // create the subscription (i.e. they were brought to the login view
         // from the pricing page)
         if (this.desiredPlan) {
-          await store.createSubscription(this.desiredPlan)
+          await store.updateSubscription(this.desiredPlan);
           // Show the payment view
-          this.$router.push({name: 'payment'});
+          this.$router.push({ name: "payment" });
         }
       } catch (e) {
         // Reset the button state
-        this.loggingIn = false
+        this.loggingIn = false;
         // Default error message
-        console.log(e);
-        this.error = 'A server error occurred.';
+        this.error = "A server error occurred.";
         // Share the error message from the server if we have it
         if (e.response && e.response.data && e.response.data.message) {
           this.error = e.response.data.message;
@@ -125,13 +132,13 @@ export default {
         // If the login page is redirected from the Pricing component, subscribe the user to
         // the desired plan
         if (this.desiredPlan) {
-          await store.updateSubscription(this.desiredPlan)
+          await store.updateSubscription(this.desiredPlan);
         }
         // New accounts should proceed to the pricing view
-        this.$router.push('pricing');
+        this.$router.push("pricing");
       } else {
         // Redirect the route, or go to the user's account page)
-        this.$router.replace(this.$route.query.redirect || 'account');
+        this.$router.replace(this.$route.query.redirect || "account");
       }
     },
     // Focus on the email input field
@@ -143,8 +150,8 @@ export default {
       this.error = false;
       this.createAccount = createAccount;
       this.focus();
-    },
-  },
+    }
+  }
 };
 </script>
 
@@ -210,7 +217,7 @@ input {
 }
 
 input[type="text"]::placeholder {
-  color: #8898AA;
+  color: #8898aa;
 }
 
 p.caption {
