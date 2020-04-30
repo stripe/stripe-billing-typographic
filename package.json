@@ -47,6 +47,7 @@
   },
   "scripts": {
     "build": "rollup -c",
+    "heroku-postbuild": "npm run setup && npm run build",
     "dev": "rollup -c -w",
     "setup": "node setup.js",
     "start": "node server/server.js",
