@@ -24,7 +24,7 @@
           </div>
           <div class="payment-method">
             <input type="radio" value="sepa" v-model="paymentMethod" id="sepa" />
-            <label for="sepa">Pay with Sepa Direct Debit</label>
+            <label for="sepa">Add a Sepa Direct Debit</label>
           </div>
           <div class="payment-method">
             <input type="radio" value="invoice" v-model="paymentMethod" id="invoice">
@@ -273,8 +273,8 @@ export default {
           type: 'sepa_debit',
           sepa_debit: this.iban,
           billing_details: {
-            name: 'Jane Bold',
-            email: 'jane@blah.com'
+            name: this.customerName,
+            email: store.email,
           }
         });
 
