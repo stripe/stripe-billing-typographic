@@ -46,6 +46,7 @@
           <template v-if="store.stripe">
             <input
               type="text"
+              class="customer-name"
               v-model="customerName"
               name="customerName"
               ref="customerName"
@@ -408,6 +409,23 @@ button.submit.loading {
 
 .payment-method:last-child {
   margin-bottom: 0;
+}
+
+
+.customer-name {
+  font-size: 15px;
+  color: #525f7f;
+  border: 0px;
+  padding: 10px 0;
+  margin-bottom: 10px;
+}
+
+.customer-name::placeholder {
+  color: #AAB7C4;
+}
+
+#iban-element {
+  margin-bottom: 20px;
 }
 
 .payment-method input {
