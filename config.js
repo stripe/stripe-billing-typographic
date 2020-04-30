@@ -4,22 +4,31 @@
  *
  * Typographic's configuration: secrets and other data are read from
  * environment variables, stored in a .env file.
- * 
+ *
  * By default, we use SQLite as the backend database for our application.
  * Any database supported by Knex can be used.
  */
 'use strict';
 
+const _ = require('lodash')
 // Load environment variables from Typographic's `.env` file:
 // this file includes the Stripe API key and other secrets
 // A sample configuration file is included: .env.example
-const envFound = require('dotenv').config();
-if (!envFound) {
-  console.log(
-    '⚠️  No .env file for Typographic found: this file contains' +
-      'your Stripe API key and other secrets.\nTry copying .env.example to .env' +
-      '(and make sure to include your own keys!)'
-  );
+const env = require('dotenv').config();
+
+const environmentVariables =   {
+  STRIPE_PUBLISHABLE_KEY: process.env.STRIPE_PUBLISHABLE_KEY,
+  STRIPE_SECRET_KEY: process.env.STRIPE_SECRET_KEY,
+  JWT_SECRET: process.env.JWT_SECRET,
+}
+
+const missingEnvironmentVariables = _.chain(environmentVariables)
+  .pickBy((environmentVariable) => _.isEmpty(environmentVariable))
+  .keys()
+  .value()
+
+if (!_.isEmpty(missingEnvironmentVariables)) {
+  console.log(`⚠️  Missing the environment variables: ${missingEnvironmentVariables.join(' ,')}.\nDo you have a .env file?\nTry copying .env.example to .env (and make sure to include your own keys!)`);
   process.exit(0);
 }
 
