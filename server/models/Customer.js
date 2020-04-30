@@ -179,7 +179,7 @@ class Customer extends Model {
       );
       // DB: Update the payment method ID
       const updated = await db(this.constructor.table)
-        .where("id", this.id)
+        .where('id', this.id)
         .update({
           paymentMethodId: paymentMethodId,
           paymentMethodType: type,
@@ -224,13 +224,13 @@ class Customer extends Model {
       await stripe.paymentMethods.detach(paymentMethodId);
 
       await db(this.constructor.table)
-        .where("id", this.id)
+        .where('id', this.id)
         .update({
-          paymentMethodId: "",
-          paymentMethodType: "",
-          paymentMethodLast4: "",
-          paymentMethodBrand: "",
-          paymentMethodSepaLast4: "",
+          paymentMethodId: '',
+          paymentMethodType: '',
+          paymentMethodLast4: '',
+          paymentMethodBrand: '',
+          paymentMethodSepaLast4: '',
         });
     } catch (e) {
       throw new Error(e);
