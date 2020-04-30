@@ -65,10 +65,7 @@
       </section>
     </section>
     <button v-if="submittingPaymentMethod" class="submit loading">Saving payment method...</button>
-    <button v-else-if="paymentMethod === 'sepa'" class="submit" @click="updateSepaPaymentMethod()">
-      <span v-text="hasPaymentMethod ? 'Update' : 'Add'"></span> payment method
-    </button>
-    <button v-else-if="paymentMethod === 'card'" class="submit" @click="updatePaymentMethod()">
+    <button v-else-if="paymentMethod !== 'invoice'" class="submit" @click="updatePaymentMethod()">
       <span v-text="hasPaymentMethod ? 'Update' : 'Add'"></span> payment method
     </button>
     <button v-else-if="paymentMethod === 'invoice'" class="submit" @click="subscribeInvoices()">
@@ -221,101 +218,87 @@ export default {
     },
     async updatePaymentMethod() {
       this.submittingPaymentMethod = true;
-
       try {
-        // Create a new PaymentMethod object
-        const { paymentMethod, error } = await store.stripe.createPaymentMethod('card', this.card);
+        const paymentMethod = this.paymentMethod === 'card' ? await this.updateCardPaymentMethod() : await this.updateSepaPaymentMethod()
 
-        // If there's an error, print to screen
-        if (error) {
-          this.cardElementsError = error.message;
-          this.submittingPaymentMethod = false;
-          throw error;
-        } else {
-          // Attach PaymentMethod to Subscription on back-end
-          const { data } = await axios.post('/api/subscription/payment_method', {
-            paymentMethodId: paymentMethod.id,
-          });
+        // Set payment method details in Store
+        store.paymentMethod = {
+          id: paymentMethod.id,
+          type: paymentMethod.type,
+          brand: paymentMethod.card ? paymentMethod.card.brand : null,
+          last4: paymentMethod.card ? paymentMethod.card.last4 : null,
+          sepa_debit_last4: paymentMethod.sepa_debit ? paymentMethod.sepa_debit.last4 : null,
+        };
 
-          // SetupIntent needs optimising
-          if (data.clientSecret) {
-            const result = await store.stripe.handleCardSetup(data.clientSecret);
+        // Update our local store and change to account view.
+        if (store.subscription) store.subscription.collectionMethod = 'charge_automatically';
 
-            if (result.error) {
-              this.cardElementsError = result.error.message;
-              this.submittingPaymentMethod = false;
-              throw result.error;
-            }
-          }
-
-          // Set id, brand, last4 in Store
-          store.paymentMethod = {
-            id: paymentMethod.id,
-            type: 'card',
-            brand: paymentMethod.card.brand,
-            last4: paymentMethod.card.last4,
-          };
-
-          // Update our local store and change to account view.
-          if (store.subscription) store.subscription.collectionMethod = 'charge_automatically';
-
-          this.$router.push('account');
-        }
+        this.$router.push('account');
       } catch (e) {
+        this.submittingPaymentMethod = false;
         console.log(`Couldn't add payment method: ${e.message}`);
       }
     },
-    async updateSepaPaymentMethod() {
-      this.submittingPaymentMethod = true;
+    async updateCardPaymentMethod() {
+      // Create a new PaymentMethod object
+      const { paymentMethod, error } = await store.stripe.createPaymentMethod('card', this.card);
 
-      try {
-        // Create a new PaymentMethod object
-        const { paymentMethod, error } = await store.stripe.createPaymentMethod({
-          type: 'sepa_debit',
-          sepa_debit: this.iban,
-          billing_details: {
-            name: this.customerName,
-            email: store.email,
-          }
-        });
-
-        // If there's an error, print to screen
-        if (error) {
-          this.sepaElementsError = error.message;
-          this.submittingPaymentMethod = false;
-          throw error;
-        } else {
-          // Attach PaymentMethod to Subscription on back-end
-          const { data } = await axios.post('/api/subscription/payment_method', {
-            paymentMethodId: paymentMethod.id,
-          });
-
-          // SetupIntent needs optimising
-          if (data.clientSecret) {
-            const result = await store.stripe.confirmSepaDebitSetup(data.clientSecret);
-
-            if (result.error) {
-              this.sepaElementsError = result.error.message;
-              this.submittingPaymentMethod = false;
-              throw result.error;
-            }
-          }
-
-          console.log('paymentMethod', paymentMethod)
-          store.paymentMethod = {
-            id: paymentMethod.id,
-            sepa_debit_last4: paymentMethod.sepa_debit.last4,
-            type: 'sepa_debit',
-          };
-
-          // Update our local store and change to account view.
-          if (store.subscription) store.subscription.collectionMethod = 'charge_automatically';
-
-          this.$router.push('account');
-        }
-      } catch (e) {
-        console.log(`Couldn't add payment method: ${e.message}`);
+      // If there's an error, print to screen
+      if (error) {
+        this.cardElementsError = error.message;
+        throw error;
       }
+
+      // Attach PaymentMethod to Subscription on back-end
+      const { data } = await this.attachPaymentMethod(paymentMethod)
+
+      // SetupIntent needs optimising
+      if (data.clientSecret) {
+        const result = await store.stripe.confirmCardSetup(data.clientSecret);
+
+        if (result.error) {
+          this.cardElementsError = result.error.message;
+          throw result.error;
+        }
+      }
+      return paymentMethod
+    },
+    async updateSepaPaymentMethod() {
+
+      const { paymentMethod, error } = await store.stripe.createPaymentMethod({
+        type: 'sepa_debit',
+        sepa_debit: this.iban,
+        billing_details: {
+          name: this.customerName,
+          email: store.email,
+        }
+      });
+
+      // If there's an error, print to screen
+      if (error) {
+        this.sepaElementsError = error.message;
+        throw error;
+      }
+
+      // Attach PaymentMethod to Subscription on back-end
+      const { data } = await this.attachPaymentMethod(paymentMethod)
+
+      // SetupIntent needs optimising
+      if (data.clientSecret) {
+        const result = await store.stripe.confirmSepaDebitSetup(data.clientSecret);
+
+        if (result.error) {
+          this.sepaElementsError = result.error.message;
+          throw result.error;
+        }
+      }
+      return paymentMethod
+    },
+
+    attachPaymentMethod(paymentMethod) {
+      return axios.post('/api/subscription/payment_method', {
+        paymentMethodId: paymentMethod.id,
+      });
     },
     changePlan() {
       this.$router.push('pricing');
