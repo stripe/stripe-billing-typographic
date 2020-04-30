@@ -23,6 +23,10 @@
             <label for="card">Add a credit or debit card</label>
           </div>
           <div class="payment-method">
+            <input type="radio" value="sepa" v-model="paymentMethod" id="sepa" />
+            <label for="sepa">Pay with Sepa Direct Debit</label>
+          </div>
+          <div class="payment-method">
             <input type="radio" value="invoice" v-model="paymentMethod" id="invoice">
             <label for="invoice">Receive invoices to pay by card or bank transfer</label>
           </div>
@@ -33,7 +37,22 @@
         <div class="details">
           <template v-if="store.stripe">
             <div id="card-element"></div>
-            <p v-show="elementsError" id="card-errors" v-text="this.elementsError"></p>
+            <p v-show="cardElementsError" id="card-errors" v-text="this.cardElementsError"></p>
+          </template>
+        </div>
+      </section><section class="payment-item billing-details" v-show="paymentMethod === 'sepa'">
+        <h2>Sepa Direct Debit details</h2>
+        <div class="details">
+          <template v-if="store.stripe">
+            <input
+              type="text"
+              v-model="customerName"
+              name="customerName"
+              ref="customerName"
+              placeholder="Jane Bold"
+            />
+            <div id="iban-element"></div>
+            <p v-show="sepaElementsError" id="sepa-errors" v-text="this.sepaElementsError"></p>
           </template>
         </div>
       </section>
@@ -45,6 +64,9 @@
       </section>
     </section>
     <button v-if="submittingPaymentMethod" class="submit loading">Saving payment method...</button>
+    <button v-else-if="paymentMethod === 'sepa'" class="submit" @click="updateSepaPaymentMethod()">
+      <span v-text="hasPaymentMethod ? 'Update' : 'Add'"></span> payment method
+    </button>
     <button v-else-if="paymentMethod === 'card'" class="submit" @click="updatePaymentMethod()">
       <span v-text="hasPaymentMethod ? 'Update' : 'Add'"></span> payment method
     </button>
@@ -71,8 +93,11 @@ export default {
     return {
       store,
       paymentMethod: 'card',
+      customerName: null,
+      iban: null,
       card: null,
-      elementsError: null,
+      cardElementsError: null,
+      sepaElementsError: null,
       submittingPaymentMethod: false,
     };
   },
@@ -89,11 +114,11 @@ export default {
     this.paymentMethod = 'card';
     // Create a Stripe Element if Stripe's library has been loaded
     if (store.stripe) {
-      this.createElement();
+      this.createElements();
       // Otherwise, set up a watcher so that when the library is loaded
       // we create our Element
     } else {
-      this.$watch('store.stripe', this.createElement);
+      this.$watch('store.stripe', this.createElements);
     }
   },
   beforeDestroy() {
@@ -125,7 +150,7 @@ export default {
     },
   },
   methods: {
-    createElement() {
+    createElements() {
       if (!store.stripe) {
         return;
       }
@@ -159,13 +184,22 @@ export default {
 
       // Create the card element, then attach it to the DOM
       this.card = elements.create('card', {style});
+      this.iban = elements.create('iban', {style, supportedCountries: ['SEPA']});
       this.card.mount('#card-element');
+      this.iban.mount('#iban-element');
       // Add an event listener: check for error messages as we type
       this.card.addEventListener('change', ({error}) => {
         if (error) {
-          this.elementsError = error.message;
+          this.cardElementsError = error.message;
         } else {
-          this.elementsError = '';
+          this.cardElementsError = '';
+        }
+      });
+      this.iban.addEventListener('change', ({error}) => {
+        if (error) {
+          this.sepaElementsError = error.message;
+        } else {
+          this.sepaElementsError = '';
         }
       });
     },
@@ -193,7 +227,7 @@ export default {
 
         // If there's an error, print to screen
         if (error) {
-          this.elementsError = error.message;
+          this.cardElementsError = error.message;
           this.submittingPaymentMethod = false;
           throw error;
         } else {
@@ -207,7 +241,7 @@ export default {
             const result = await store.stripe.handleCardSetup(data.clientSecret);
 
             if (result.error) {
-              this.elementsError = result.error.message;
+              this.cardElementsError = result.error.message;
               this.submittingPaymentMethod = false;
               throw result.error;
             }
@@ -216,8 +250,61 @@ export default {
           // Set id, brand, last4 in Store
           store.paymentMethod = {
             id: paymentMethod.id,
+            type: 'card',
             brand: paymentMethod.card.brand,
             last4: paymentMethod.card.last4,
+          };
+
+          // Update our local store and change to account view.
+          if (store.subscription) store.subscription.collectionMethod = 'charge_automatically';
+
+          this.$router.push('account');
+        }
+      } catch (e) {
+        console.log(`Couldn't add payment method: ${e.message}`);
+      }
+    },
+    async updateSepaPaymentMethod() {
+      this.submittingPaymentMethod = true;
+
+      try {
+        // Create a new PaymentMethod object
+        const { paymentMethod, error } = await store.stripe.createPaymentMethod({
+          type: 'sepa_debit',
+          sepa_debit: this.iban,
+          billing_details: {
+            name: 'Jane Bold',
+            email: 'jane@blah.com'
+          }
+        });
+
+        // If there's an error, print to screen
+        if (error) {
+          this.sepaElementsError = error.message;
+          this.submittingPaymentMethod = false;
+          throw error;
+        } else {
+          // Attach PaymentMethod to Subscription on back-end
+          const { data } = await axios.post('/api/subscription/payment_method', {
+            paymentMethodId: paymentMethod.id,
+          });
+
+          // SetupIntent needs optimising
+          if (data.clientSecret) {
+            const result = await store.stripe.confirmSepaDebitSetup(data.clientSecret);
+
+            if (result.error) {
+              this.sepaElementsError = result.error.message;
+              this.submittingPaymentMethod = false;
+              throw result.error;
+            }
+          }
+
+          console.log('paymentMethod', paymentMethod)
+          store.paymentMethod = {
+            id: paymentMethod.id,
+            sepa_debit_last4: paymentMethod.sepa_debit.last4,
+            type: 'sepa_debit',
           };
 
           // Update our local store and change to account view.

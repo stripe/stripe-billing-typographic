@@ -115,8 +115,10 @@ async function createTables() {
       t.integer('createdAt');
       t.string('fonts');
       t.string('paymentMethodId');
+      t.string('paymentMethodType');
       t.string('paymentMethodLast4');
       t.string('paymentMethodBrand');
+      t.string('paymentMethodSepaLast4');
     }),
     knex.schema.createTable('subscriptions', t => {
       t.increments();

@@ -12,3 +12,4 @@ cloud_sql_proxy
 app.yaml
 # OS X
 .DS_Store
+.vscode

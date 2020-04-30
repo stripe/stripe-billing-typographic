@@ -41,8 +41,10 @@ class Customer extends Model {
     this.email = opts.email;
     this.fonts = opts.fonts;
     this.paymentMethodId = opts.paymentMethodId;
+    this.paymentMethodType = opts.paymentMethodType;
     this.paymentMethodLast4 = opts.paymentMethodLast4;
     this.paymentMethodBrand = opts.paymentMethodBrand;
+    this.paymentMethodSepaLast4 = opts.paymentMethodSepaLast4;
   }
 
   // Get a Customer by id from the database
@@ -105,8 +107,10 @@ class Customer extends Model {
     if (this.paymentMethodId) {
       json.paymentMethod = {
         id: this.paymentMethodId,
+        type: this.paymentMethodType,
         last4: this.paymentMethodLast4,
         brand: this.paymentMethodBrand,
+        sepa_debit_last4: this.paymentMethodSepaLast4,
       };
     }
 
@@ -169,18 +173,19 @@ class Customer extends Model {
   async updatePaymentMethod(paymentMethodId) {
     try {
       // Attach PaymentMethod to Customer
-      const { card } = await stripe.paymentMethods.attach(
+      const { card, sepa_debit, type } = await stripe.paymentMethods.attach(
         paymentMethodId,
         { customer: this.stripeId }
       );
-
       // DB: Update the payment method ID
       const updated = await db(this.constructor.table)
-        .where('id', this.id)
+        .where("id", this.id)
         .update({
           paymentMethodId: paymentMethodId,
-          paymentMethodLast4: card.last4,
-          paymentMethodBrand: card.brand,
+          paymentMethodType: type,
+          paymentMethodLast4: card ? card.last4 : null,
+          paymentMethodBrand: card ? card.brand : null,
+          paymentMethodSepaLast4: sepa_debit ? sepa_debit.last4 : null,
         });
 
       // Fetch Subscription
@@ -217,13 +222,15 @@ class Customer extends Model {
     try {
       // Stripe API: Remove the default payment method
       await stripe.paymentMethods.detach(paymentMethodId);
-      
+
       await db(this.constructor.table)
-        .where('id', this.id)
+        .where("id", this.id)
         .update({
-          paymentMethodId: '',
-          paymentMethodLast4: '',
-          paymentMethodBrand: '',
+          paymentMethodId: "",
+          paymentMethodType: "",
+          paymentMethodLast4: "",
+          paymentMethodBrand: "",
+          paymentMethodSepaLast4: "",
         });
     } catch (e) {
       throw new Error(e);
