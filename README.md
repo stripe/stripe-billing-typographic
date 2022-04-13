@@ -80,6 +80,11 @@ If this is your first time running the app, you'll need to set up the app:
 npm run setup
 ```
 
+Run the node backend server in dev mode
+```
+npm run dev
+```
+
 Run the app:
 ```
 npm start
