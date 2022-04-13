@@ -15,7 +15,7 @@
           <template v-else>
             <p>{{currentPlan.name}} plan, ${{currentPlan.rate}} per month</p>
             <ul>
-              <li v-for="(feature, index) in currentPlan.features" 
+              <li v-for="(feature, index) in currentPlan.features"
                   v-text="feature" :key="index" class="feature"></li>
             </ul>
           </template>
@@ -26,9 +26,16 @@
         <h2>Payment</h2>
         <div class="details payment-details">
           <template v-if="store.paymentMethod && store.subscription.collectionMethod === 'charge_automatically'">
-            <div :class="['card-brand', store.paymentMethod.brand.toLowerCase()]"></div>
-            <p class="last4">&bull;&bull;&bull;&bull;{{store.paymentMethod.last4}}</p>
+            <template v-if="store.paymentMethod.type === 'card'">
+              <div :class="['card-brand', store.paymentMethod.brand.toLowerCase()]"></div>
+              <p class="last4">&bull;&bull;&bull;&bull;{{store.paymentMethod.last4}}</p>
+            </template>
+            <template v-else-if="store.paymentMethod.type === 'sepa_debit'">
+              <p>Sepa Debit ending: {{store.paymentMethod.sepa_debit_last4}}</p>
+            </template>
+            <p v-else>Unknown payment method.</p>
           </template>
+
           <p v-else-if="store.subscription && store.subscription.collectionMethod === 'send_invoice'">
             Invoices will be emailed at the end of the billing cycle.
           </p>
@@ -40,7 +47,7 @@
         <h2>Billing cycle</h2>
         <div class="details">
           <p v-if="store.subscription">
-            You’ll be billed <span :class="{'full': extraRequests > 0}" 
+            You’ll be billed <span :class="{'full': extraRequests > 0}"
               v-text="nextBillingEstimate"></span> on {{nextBillingCycle}}.
           </p>
           <p v-else>You don’t have an active subscription.</p>
@@ -57,7 +64,7 @@
             </p>
             <p v-else>
               You’ve chosen <strong>{{store.selectedFonts.length}} of your
-              {{currentPlan.maxFonts ? currentPlan.maxFonts : 'unlimited'}} 
+              {{currentPlan.maxFonts ? currentPlan.maxFonts : 'unlimited'}}
               included</strong> {{currentPlan.maxFonts === 1 ? 'font' : 'fonts' }}.
             </p>
           </div>
@@ -77,7 +84,7 @@
               </p>
             </template>
             <div class="meter">
-              <div class="progress" :class="{full: extraRequests > 0}" 
+              <div class="progress" :class="{full: extraRequests > 0}"
                    :style="{width: requestPercentage+'%'}"></div>
               </div>
             <div class="upgrade-plan" v-if="extraRequests > 0">

@@ -20,15 +20,6 @@ try {
   process.exit(0);
 }
 
-// Make sure .env file exists
-try {
-  const exists = fs.accessSync(path.join(process.cwd(), '.env'));
-} catch (e) {
-  console.log(
-    '⚠️  Missing `.env` file. Copy `.env.example` and include your Stripe credentials.'
-  );
-  process.exit(0);
-}
 
 const config = require('./config');
 const stripe = require('stripe')(config.stripe.secretKey);
@@ -115,8 +106,10 @@ async function createTables() {
       t.integer('createdAt');
       t.string('fonts');
       t.string('paymentMethodId');
+      t.string('paymentMethodType');
       t.string('paymentMethodLast4');
       t.string('paymentMethodBrand');
+      t.string('paymentMethodSepaLast4');
     }),
     knex.schema.createTable('subscriptions', t => {
       t.increments();
