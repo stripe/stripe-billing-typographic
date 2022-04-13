@@ -113,7 +113,7 @@ export default {
     estimatedTotalCost: function() {
       // Calculate if we have any extra requests to account for
       let extraRequests =
-        this.estimatedRequests - this.matchingPlan.numRequests;
+        this.estimatedRequests - this.store.getPlan(this.estimatedPlanId).numRequests;
       if (extraRequests < 0) {
         extraRequests = 0;
       }
