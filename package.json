@@ -18,7 +18,7 @@
     "body-parser": "^1.18.3",
     "connect-history-api-fallback": "^1.5.0",
     "dotenv": "^5.0.1",
-    "express": "^4.16.3",
+    "express": "^4.17.3",
     "follow-redirects": "^1.14.7",
     "jsonwebtoken": "^8.3.0",
     "jwt-decode": "^2.2.0",
