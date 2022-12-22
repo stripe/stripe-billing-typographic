@@ -20,7 +20,7 @@
     "dotenv": "^5.0.1",
     "express": "^4.16.3",
     "follow-redirects": "^1.14.7",
-    "jsonwebtoken": "^8.3.0",
+    "jsonwebtoken": "^9.0.0",
     "jwt-decode": "^2.2.0",
     "knex": "^0.14.6",
     "lodash": "^4.17.20",
